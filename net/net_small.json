@@ -1,0 +1,13 @@
+{
+    "conv":{
+        "out_channels1": 64,
+        "out_channels2": 128,
+        "out_channels3": 256
+    },
+    "transformer":{
+        "d_model": 512,
+        "d_ff": 1024,
+        "n_heads": 8,
+        "n_layers": 2
+    }
+}

@@ -1,0 +1,16 @@
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_00.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_01.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_02.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_03.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_04.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_05.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_06.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_07.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_08.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_09.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_10.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_11.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_12.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_13.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_14.txt
+./data_fsd50k_tau-srir/val/list_dataset/fsd50k_tau-srir_foa_val_part_category_15.txt
