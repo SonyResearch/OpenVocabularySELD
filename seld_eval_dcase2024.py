@@ -1,6 +1,7 @@
 # Copyright 2025 Sony AI
 
 import codecs
+import numpy as np
 
 from dcase2024_task3_seld_metrics import parameters, cls_compute_seld_results
 
@@ -23,8 +24,10 @@ def all_seld_eval(ref_files_folder, pred_output_format_files, test_dataset, part
             assert False, "FSD50K_TAU-SRIR_part requires to set part_category_txt"
 
     score_obj = cls_compute_seld_results.ComputeSELDResults(params, ref_files_folder=ref_files_folder, list_part_category=list_part_category)
-    er20, f20, le, lr, seld_err, classwise_test_scr, other_scores = score_obj.get_SELD_Results(pred_output_format_files)
+    er20, f20, le, lr, _seld_err, classwise_test_scr, other_scores = score_obj.get_SELD_Results(pred_output_format_files)
     er20_d, er20_i, er20_s, pre, rec, lf, lp, classwise_other_results = other_scores
+
+    seld_err = np.mean([er20, 1 - f20, le / 180, 1 - lr])  # we compute SELD error with class-averaged ER20, F20, LE, and LR for publication
 
     if print_stdout is True:
         print('SELD scores')
