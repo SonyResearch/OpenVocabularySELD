@@ -10,8 +10,7 @@ data_dcase2023_task3/*
 !data_dcase2023_task3/list_dataset/
 data_fsd50k_tau-srir/*
 !data_fsd50k_tau-srir/list_dataset/
-!data_fsd50k_tau-srir/fsd50k/
-data_fsd50k_tau-srir/fsd50k/fsd50k_all/
+!data_fsd50k_tau-srir/fsd50k/fsd50k_all_class.txt
 
 dict_pickle/*
 !dict_pickle/common/

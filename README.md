@@ -9,7 +9,7 @@ We aim for an open-vocabulary sound event localization and detection (SELD) syst
 The provided system has been tested on python 3.10.12 and pytorch 2.3.1.
 
 You can install the requirements by running the following lines.
-```
+```bash
 python3 -m venv ~/venv/ovseld
 source ~/venv/ovseld/bin/activate
 pip3 install --upgrade pip setuptools
@@ -19,10 +19,10 @@ pip3 install -r requirements.txt
 
 ### Data preparation for training example
 We provide example training data, config, and pre-made parameter files for a quick start.
-The data and files can be downloaded from the link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17479532).
+The data and files can be downloaded from the link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
 
 You can unzip the train and val ZIP files on `data_fsd50k_tau-srir/`.
-```
+```bash
 cd data_fsd50k_tau-srir/
 unzip train_2250files_example.zip
 unzip val_example.zip
@@ -48,23 +48,23 @@ This will dump the logs and models in the `data_fsd50k_tau-srir/model_monitor/<D
 
 The training requires 40GB of GPU memory.
 We tested the script on one NVIDIA H100, and it takes around half a dozen hours.
-```
+```bash
 bash script/train_seld_foa_medium_2250.sh
 ```
 
 The small model size version is the same.
-```
+```bash
 bash script/train_seld_foa_small_2250.sh
 ```
 
 You can check the training details using TensorBoard.
 
 If you would like to run training with large data (e.g., 90,000 min), you need to make such data in your environment.
-Please see the advanced data preparation section.
+Please see [fsd50k_tau-srir_data_generator/README_data_generator.md](fsd50k_tau-srir_data_generator/README_data_generator.md).
 
 ### Data preparation for evaluation example
 We provide a pre-trained model parameter file (Model size: medium, Train data size: 90,000 min).
-The PTH file can be downloaded from the same link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17479532).
+The PTH file can be downloaded from the same link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
 
 The PTH file `params_swa_20251029062140_154940_0040000.pth` should be put under `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/`.
 
@@ -87,7 +87,7 @@ Note that we use only `dev-test` directories.
 
 ### Evaluation example
 After the preparation, you can run the script below.
-```
+```bash
 bash script/eval_seld_foa.sh
 ```
 
@@ -109,7 +109,19 @@ This is a reproduced result on our model (Model size: medium, Train data size: 9
 You can get a result similar to our publication.
 
 ### Advanced data preparation
-Under preparation.
+For the synthesis of large training data, please visit [fsd50k_tau-srir_data_generator/README_data_generator.md](fsd50k_tau-srir_data_generator/README_data_generator.md).
+
+(Optional) If you would like to make parameter NPY files yourself, you can run the code below.
+```bash
+python make_data_python/make_class_clap_npy.py
+```
+
+(Optional) Making PICKLE files yourself requires the `data_fsd50k_tau-srir/fsd50k/fsd50k_all/` directory.
+Please check the data generator's README.
+```bash
+python make_data_python/make_dict_fsdid2categoryid.py
+python make_data_python/make_dict_fsdidwav2clap.py  # takes a few hours
+```
 
 ## Citation
 If you found this repository useful, please consider citing

@@ -11,7 +11,7 @@ def main():
     list_all_category = [i for i in range(192)]
     num_each_category = 12
     num_list_part = 16
-    save_dir = "./data_fsd50k_tau-srir/val/list_category/"
+    save_dir = "../data_fsd50k_tau-srir/val/list_category/"
     os.makedirs(save_dir, exist_ok=True)
 
     count_list_part = 0
