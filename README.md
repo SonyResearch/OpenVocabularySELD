@@ -17,56 +17,42 @@ pip3 install torch==2.3.1 torchvision==0.18.1 torchaudio==2.3.1 --index-url http
 pip3 install -r requirements.txt
 ```
 
-### Data preparation for training example
-We provide example training data, config, and pre-made parameter files for a quick start.
-The data and files can be downloaded from the link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
+### Data preparation for inference example
+This inference example only performs inference and does not evaluate the estimation.
 
-You can unzip the train and val ZIP files on `data_fsd50k_tau-srir/`.
+We provide a pre-trained model parameter file (Model size: medium, Train data size: 90,000 min).
+The PTH file can be downloaded from the link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
+
+The PTH file `params_swa_20251029062140_154940_0040000.pth` should be put under `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/`.
 ```bash
-cd data_fsd50k_tau-srir/
-unzip train_2250files_example.zip
-unzip val_example.zip
+mkdir -p ./data_fsd50k_tau-srir/model_monitor/20251029062140_154940/
+wget -P ./data_fsd50k_tau-srir/model_monitor/20251029062140_154940/ https://zenodo.org/records/17481905/files/params_swa_20251029062140_154940_0040000.pth
 ```
 
-After unzip, the directory structure can be below.
+Example data are already set in this repository.
+`data_inference/example/fold3_room6_mix001_157to172sec.wav` is an FOA audio file containing speech, acoustic guitar, and piano.
+`data_inference/example/fold3_room6_mix001_157to172sec.txt` is a text file for the target categories used in this inference example.
+
+### Inference example
+After the preparation, you can run the script below.
+```bash
+bash script/inference_seld_foa.sh
 ```
-.
-├── data_fsd50k_tau-srir
-│   ├── fsd50k (already set on this repo)
-│   ├── list_dataset (already set on this repo)
-│   ├── train
-│   └── val
+
+You can see the inference result in `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/inference_example_foa_0040000/fold3_room6_mix001_157to172sec.csv`.
+Each row in the csv file corresponds to an sound event detected in each frame (0.1 sec).
+It contains the following columns: frame, activity (0 to 1), azimuth (-180 to 180 deg), elevation (-90 t0 90 deg), top1 category, top1 similarity (i.e., cosine similarity between the event's embedding and top1 category's CLAP text embedding), top2 category, top2 similarity, top3 category, and top3 similarity.
+```
+0,0.876,-99.2,6.8,speech,0.199,silent,-0.072,acoustic guitar,-0.251
+1,0.931,-110.1,9.3,speech,0.199,silent,-0.072,acoustic guitar,-0.261
+...
+48,0.995,-43.6,-19.6,piano,0.535,acoustic guitar,0.298,silent,-0.059
+48,0.877,-68.5,-19.6,acoustic guitar,0.372,piano,0.146,silent,-0.119
 ...
 ```
 
-The PICKLE file `dict_fsdidwav2clap.pickle` should be put under `dict_pickle/630k-audioset-best/`.
-Other small PICKLE and NPY files are already set on the GitHub repository.
-
-### Training example
-After the preparation, you can run the script below.
-This will dump the logs and models in the `data_fsd50k_tau-srir/model_monitor/<DateTime>_<JobID>`.
-
-The training requires 40GB of GPU memory.
-We tested the script on one NVIDIA H100, and it takes around half a dozen hours.
-```bash
-bash script/train_seld_foa_medium_2250.sh
-```
-
-The small model size version is the same.
-```bash
-bash script/train_seld_foa_small_2250.sh
-```
-
-You can check the training details using TensorBoard.
-
-If you would like to run training with large data (e.g., 90,000 min), you need to make such data in your environment.
-Please see [fsd50k_tau-srir_data_generator/README_data_generator.md](fsd50k_tau-srir_data_generator/README_data_generator.md).
-
 ### Data preparation for evaluation example
-We provide a pre-trained model parameter file (Model size: medium, Train data size: 90,000 min).
-The PTH file can be downloaded from the same link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
-
-The PTH file `params_swa_20251029062140_154940_0040000.pth` should be put under `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/`.
+We use the same pre-trained model parameter file for evaluation example.
 
 The TNSSE21 and STARSS23 datasets can be downloaded from their links [TAU-NIGENS Spatial Sound Events 2021](https://zenodo.org/records/5476980) and [STARSS23: Sony-TAu Realistic Spatial Soundscapes 2023](https://zenodo.org/records/7880637).
 
@@ -108,8 +94,51 @@ All     0.725   0.212   23.40   0.332   0.578   ...
 This is a reproduced result on our model (Model size: medium, Train data size: 90,000 min).
 You can get a result similar to our publication.
 
+### Data preparation for training example
+We provide example training data, config, and pre-made parameter files for a quick start.
+The data and files can be downloaded from the same link [OpenVocabularySELD Supplemental Materials](https://zenodo.org/records/17481905).
+
+You can unzip the train and val ZIP files on `data_fsd50k_tau-srir/`.
+```bash
+cd data_fsd50k_tau-srir/
+unzip train_2250files_example.zip
+unzip val_example.zip
+```
+
+After unzip, the directory structure can be below.
+```
+.
+├── data_fsd50k_tau-srir
+│   ├── fsd50k (already set on this repo)
+│   ├── list_dataset (already set on this repo)
+│   ├── train
+│   └── val
+...
+```
+
+The PICKLE file `dict_fsdidwav2clap.pickle` should be put under `dict_pickle/630k-audioset-best/`.
+Other small PICKLE and NPY files are already set on the GitHub repository.
+
+### Training example
+After the preparation, you can run the script below.
+This will dump the logs and models in the `data_fsd50k_tau-srir/model_monitor/<DateTime>_<JobID>`.
+
+The training requires 40GB of GPU memory.
+We tested the script on one NVIDIA H100, and it takes around half a dozen hours.
+```bash
+bash script/train_seld_foa_medium_2250.sh
+```
+
+The small model size version is the same.
+```bash
+bash script/train_seld_foa_small_2250.sh
+```
+
+You can check the training details using TensorBoard.
+
 ### Advanced data preparation
-For the synthesis of large training data, please visit [fsd50k_tau-srir_data_generator/README_data_generator.md](fsd50k_tau-srir_data_generator/README_data_generator.md).
+If you would like to run training with large data (e.g., 90,000 min), you need to make such data in your environment.
+For the synthesis of training data, please visit [fsd50k_tau-srir_data_generator/README_data_generator.md](fsd50k_tau-srir_data_generator/README_data_generator.md).
 
 (Optional) If you would like to make parameter NPY files yourself, you can run the code below.
 ```bash
