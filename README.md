@@ -40,7 +40,7 @@ bash script/inference_seld_foa.sh
 ```
 
 The result is in `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/inference_example_foa_0040000/`.
-Each row in the result csv file corresponds to a sound event detected in each frame (0.1 sec).
+Each row in the result CSV file corresponds to a sound event detected in each frame (0.1 sec).
 It contains the following columns: frame, activity (0 to 1), azimuth (-180 to 180 deg), elevation (-90 t0 90 deg), top1 category, top1 similarity (i.e., cosine similarity between the event's embedding and top1 category's CLAP text embedding), top2 category, top2 similarity, top3 category, and top3 similarity.
 ```
 0,0.876,-99.2,6.8,speech,0.199,silent,-0.072,acoustic guitar,-0.251
@@ -49,6 +49,12 @@ It contains the following columns: frame, activity (0 to 1), azimuth (-180 to 18
 48,0.995,-43.6,-19.6,piano,0.535,acoustic guitar,0.298,silent,-0.059
 48,0.877,-68.5,-19.6,acoustic guitar,0.372,piano,0.146,silent,-0.119
 ...
+```
+
+You can also run the visualization script.
+It overlay the CSV event results onto the corresponding 360 equirectangular video.
+```bash
+python visualize_inference/make_ovseld_video.py
 ```
 
 ### Data preparation for evaluation example
