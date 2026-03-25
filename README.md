@@ -29,9 +29,9 @@ mkdir -p ./data_fsd50k_tau-srir/model_monitor/20251029062140_154940/
 wget -P ./data_fsd50k_tau-srir/model_monitor/20251029062140_154940/ https://zenodo.org/records/17481905/files/params_swa_20251029062140_154940_0040000.pth
 ```
 
-Example data are already set in this repository.
-`data_inference/example/fold3_room6_mix001_157to172sec.wav` is an FOA audio file containing speech, acoustic guitar, and piano.
-`data_inference/example/fold3_room6_mix001_157to172sec.txt` is a text file for the target categories used in this inference example.
+Example data are already set in `data_inference/example/`.
+The FOA audio file contains speech, acoustic guitar, and piano.
+The text file includes the target categories used in this inference example.
 
 ### Inference example
 After the preparation, you can run the script below.
@@ -39,7 +39,7 @@ After the preparation, you can run the script below.
 bash script/inference_seld_foa.sh
 ```
 
-You can see the inference result in `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/inference_example_foa_0040000/fold3_room6_mix001_157to172sec.csv`.
+You can see the result csv file in `data_fsd50k_tau-srir/model_monitor/20251029062140_154940/inference_example_foa_0040000/`.
 Each row in the csv file corresponds to an sound event detected in each frame (0.1 sec).
 It contains the following columns: frame, activity (0 to 1), azimuth (-180 to 180 deg), elevation (-90 t0 90 deg), top1 category, top1 similarity (i.e., cosine similarity between the event's embedding and top1 category's CLAP text embedding), top2 category, top2 similarity, top3 category, and top3 similarity.
 ```
