@@ -1,8 +1,6 @@
 .python-version
 
 __pycache__/
-*/__pycache__/
-*/*/__pycache__/
 
 data_dcase2021_task3/*
 !data_dcase2021_task3/list_dataset/
@@ -11,6 +9,9 @@ data_dcase2023_task3/*
 data_fsd50k_tau-srir/*
 !data_fsd50k_tau-srir/list_dataset/
 !data_fsd50k_tau-srir/fsd50k/fsd50k_all_class.txt
+data_inference/*
+!data_inference/list_dataset/
+!data_inference/example/
 
 dict_pickle/*
 !dict_pickle/common/

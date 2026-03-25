@@ -8,6 +8,7 @@ import json
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import tqdm
+import librosa
 
 from util.func_seld_data_loader import select_time, get_label, get_label_mix
 from feature.feature import SpectralFeature
@@ -21,6 +22,7 @@ def create_data_loader(args, clap_embedding):
 class SELDDataSet(Dataset):
     def __init__(self, args, clap_embedding):
         self._args = args
+        self._fs = self._args.sampling_frequency
 
         self._train_wav_dict = {}
         self._time_array_dict = {}
@@ -127,7 +129,12 @@ class SELDDataSet(Dataset):
         path, wav_fs = random.choice(list(train_wav_dict.items()))
         time_array = self._time_array_dict[path]
         if self._args.train_wav_from == "disk_wav":
-            wav, fs = sf.read(path, dtype='float32', always_2d=True)
+            info = sf.info(path)
+            if info.samplerate == self._fs:
+                wav, fs = sf.read(path, dtype='float32', always_2d=True)
+            else:
+                wav, fs = librosa.load(path, sr=self._fs, mono=False)  # if sampling frequency is different, librosa will resample
+                wav = wav.T  # (ch, time) to (time, ch)
         start = select_time(self._args.train_wav_length, wav, fs)
         return path, time_array, wav, fs, start
 

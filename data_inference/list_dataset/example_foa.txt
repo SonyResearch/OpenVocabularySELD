@@ -1,0 +1,1 @@
+./data_inference/example/fold3_room6_mix001_157to172sec.wav

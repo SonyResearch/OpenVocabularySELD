@@ -13,13 +13,16 @@ import time
 from util.args import get_args
 from util.validation_monitor import ValidationMonitor
 from clap_embedding import CLAPEmbedding
+from clap_embedding_inference import CLAPEmbeddingInference
 from seld_trainer import SELDTrainer
-from seld_validator import SELDValidator
+from seld_validator import SELDValidator, SELDInference
 
 
 def main():
     args = get_args()
-    if args.eval:
+    if args.inference:
+        inference(args)
+    elif args.eval:
         evaluation(args)
     elif args.train:
         train(args)
@@ -73,6 +76,16 @@ def evaluation(args):
                                    args.teacher_model, args.prompt, args.thresh_emb_interference)
     seld_validator = SELDValidator(args, clap_embedding, os.path.dirname(args.test_model))
     _ = seld_validator.validation(args.test_model)
+
+
+def inference(args):
+    random.seed(args.random_seed)
+    np.random.seed(args.random_seed)
+
+    clap_embedding_inference = CLAPEmbeddingInference(args.target_embed_size, args.similarity_type,
+                                                      args.teacher_model, args.prompt)
+    seld_inference = SELDInference(args, clap_embedding_inference, os.path.dirname(args.test_model))
+    _ = seld_inference.inference()
 
 
 if __name__ == '__main__':

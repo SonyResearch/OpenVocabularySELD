@@ -8,7 +8,7 @@ import numpy as np
 import codecs
 
 from wav_convertor import WavConvertor
-from seld_predictor import SELDClassifier, SELDDetector
+from seld_predictor import SELDClassifier, SELDDetector, SELDDetectorInference
 from seld_eval_dcase2024 import all_seld_eval
 
 
@@ -192,3 +192,71 @@ class SELDValidator(object):
             avg_other_scores[0], avg_other_scores[1], avg_other_scores[2],
             avg_other_scores[3], avg_other_scores[4], avg_other_scores[5], avg_other_scores[6]),
             file=codecs.open(overall_result_path, 'a', 'utf-8'))
+
+
+class SELDInference(object):
+    def __init__(self, args, clap_embedding_inference, monitor_path):
+        self._args = args
+        self._clap_embedding_inference = clap_embedding_inference
+        self._wav_convertor = WavConvertor(self._args)
+
+        wav_txt_name = os.path.splitext(os.path.basename(self._args.test_wav_txt))[0]
+        model_iter = os.path.splitext(os.path.basename(self._args.test_model))[0][-7:]  # iteration
+        tag = f'{wav_txt_name}_{model_iter}'
+        self._pred_dir = os.path.join(monitor_path, f'inference_{tag}')
+        os.makedirs(self._pred_dir, exist_ok=True)
+
+        wav_path_list = pd.read_table(self._args.test_wav_txt, header=None).values.tolist()
+        assert self._args.disk_config_test is None, (
+            "Using disk_config_test is not supported in inference. This arg is for validation to flexibly change disk of test data."
+        )
+        self._test_wav_path_list = [x[0] for x in wav_path_list]
+
+    def inference(self):
+        assert self._args.detector == 'embaccdoa', f"Unsupported detector: {self._args.detector}. Only 'embaccdoa' is supported."
+        self._seld_classifier = SELDClassifier(self._args)
+
+        for test_wav_path in tqdm.tqdm(self._test_wav_path_list, desc='[Inference]'):
+            pred_name = os.path.splitext(os.path.basename(test_wav_path))[0]
+            pred_path = os.path.join(self._pred_dir, f'{pred_name}.csv')
+
+            test_category_txt_path = test_wav_path.replace("wav", "txt")
+            self._clap_embedding_inference.set_list_clap_embedding_infer_from_category_txt(test_category_txt_path)
+            assert self._args.num_track == 3, f"Unsupported num_track: {self._args.num_track}. Only num_track=3 is supported."
+            self._seld_detector = SELDDetectorInference(self._args, self._clap_embedding_inference)
+
+            assert self._args.use_raw_output_array == 'none', (
+                f"Unsupported use_raw_output_array: {self._args.use_raw_output_array}. Only 'none' is supported."
+            )
+            _ = self._pred_wav(test_wav_path, pred_path)
+
+        return 0
+
+    def _pred_wav(self, wav_path, pred_path):
+        # input setup
+        assert self._args.test_wav_from == 'disk', f"Unsupported test_wav_from: {self._args.test_wav_from}. Only 'disk' is supported."
+        wav_pad, duration = self._wav_convertor.wav_path2wav(wav_path)
+        spec_pad = self._wav_convertor.wav2spec(wav_pad)
+
+        # classifier and detector setup
+        self._seld_classifier.set_input(spec_pad)
+        self._seld_detector.set_duration(duration)
+        time_array = self._seld_detector.get_time_array()
+
+        # minibatch-like processing for classifier
+        for index, time in enumerate(time_array[::self._args.batch_size]):
+            self._seld_classifier.receive_input(
+                time_array[index * self._args.batch_size: (index + 1) * self._args.batch_size])
+            self._seld_classifier.calc_output()
+            self._seld_detector.set_minibatch_result(
+                index=index,
+                result=self._seld_classifier.get_output()
+            )
+        self._seld_detector.minibatch_result2raw_output_array()
+
+        # online-like processing for detector
+        for index, time in enumerate(time_array):
+            self._seld_detector.detect(index=index, time=time)
+        self._seld_detector.save_df(pred_path)
+
+        return 0

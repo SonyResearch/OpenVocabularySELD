@@ -3,6 +3,7 @@
 import numpy as np
 import soundfile as sf
 import json
+import librosa
 
 from feature.feature import SpectralFeature
 
@@ -17,7 +18,12 @@ class WavConvertor(object):
         self._hop_frame_len = round(self._args.test_wav_hop_length * self._fs / self._args.stft_hop_size)
 
     def wav_path2wav(self, wav_path):
-        wav, _ = sf.read(wav_path, dtype='float32', always_2d=True)
+        info = sf.info(wav_path)
+        if info.samplerate == self._fs:
+            wav, _ = sf.read(wav_path, dtype='float32', always_2d=True)
+        else:
+            wav, _ = librosa.load(wav_path, sr=self._fs, mono=False)  # if sampling frequency is different, librosa will resample
+            wav = wav.T  # (ch, time) to (time, ch)
         wav_ch = wav.shape[1]
         if len(wav) % self._args.stft_hop_size != 0:
             wav = wav[0:-(len(wav) % self._args.stft_hop_size)]

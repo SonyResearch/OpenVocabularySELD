@@ -62,7 +62,7 @@ class SELDClassifier(object):
 
 
 class SELDDetector(object):
-    def __init__(self, args, clap_embedding, list_clap_embedding_infer):
+    def __init__(self, args, clap_embedding, list_clap_embedding_infer=None):
         self._args = args
         self._clap_embedding = clap_embedding
         self._list_clap_embedding_infer = list_clap_embedding_infer
@@ -159,11 +159,11 @@ class SELDDetector(object):
             azi_mean2, ele_mean2, bin_mean2, emb_mean2 = self._azi_ele_bin_emb2mean(azi2, ele2, bin2, emb2, net_idx_start, net_idx_end)
 
             if bin_mean0 > self._thresh_bin:
-                self._append_df(frame, emb_mean0, azi_mean0, ele_mean0)
+                self._append_df(frame, emb_mean0, azi_mean0, ele_mean0, bin_mean0)
             if bin_mean1 > self._thresh_bin:
-                self._append_df(frame, emb_mean1, azi_mean1, ele_mean1)
+                self._append_df(frame, emb_mean1, azi_mean1, ele_mean1, bin_mean1)
             if bin_mean2 > self._thresh_bin:
-                self._append_df(frame, emb_mean2, azi_mean2, ele_mean2)
+                self._append_df(frame, emb_mean2, azi_mean2, ele_mean2, bin_mean2)
 
     def _xyz2azi_ele_bin(self, x, y, z):
         azi = np.arctan2(y, x)
@@ -179,7 +179,7 @@ class SELDDetector(object):
         emb_mean = np.sum(bin[idx_start: idx_end] * emb[:, idx_start: idx_end], axis=1) / np.sum(bin[idx_start: idx_end])
         return azi_mean, ele_mean, bin_mean, emb_mean
 
-    def _append_df(self, frame, emb_mean, azi_mean, ele_mean):
+    def _append_df(self, frame, emb_mean, azi_mean, ele_mean, bin_mean):
         event_class = self._clap_embedding.emb2class(emb_mean, self._list_clap_embedding_infer)
         if event_class != -1:
             self._df = self._df.append(pd.DataFrame([(frame, event_class, azi_mean / np.pi * 180, ele_mean / np.pi * 180)]))
@@ -189,3 +189,19 @@ class SELDDetector(object):
             self._df = self._df.sort_values(0)
             self._df = self._df[self._df[0] < int(self._duration * self._frame_per_sec4csv)]  # cut frames after duration
         self._df.to_csv(pred_path, sep=',', index=False, header=False)
+
+
+class SELDDetectorInference(SELDDetector):
+    def _append_df(self, frame, emb_mean, azi_mean, ele_mean, bin_mean):
+        top3_categories, top3_similarities = self._clap_embedding.emb2top3_cat_with_sim(emb_mean)
+        if top3_categories[0] != "silent":
+            # rounding for better readability in csv during this inference
+            self._df = self._df.append(pd.DataFrame([(
+                frame,
+                round(bin_mean, 3),
+                round(azi_mean / np.pi * 180, 1),
+                round(ele_mean / np.pi * 180, 1),
+                top3_categories[0], round(top3_similarities[0], 3),
+                top3_categories[1], round(top3_similarities[1], 3),
+                top3_categories[2], round(top3_similarities[2], 3),
+            )]))

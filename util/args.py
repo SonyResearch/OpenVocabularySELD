@@ -36,6 +36,7 @@ def get_args():
     parser.add_argument('--train', '-train', action='store_true', help='Train.')
     parser.add_argument('--val', '-val', action='store_true', help='Val.')
     parser.add_argument('--eval', '-eval', action='store_true', help='Eval.')
+    parser.add_argument('--inference', '-inference', action='store_true', help='Inference.')
     parser.add_argument('--quick-check', action='store_true', help='Quick check for new implementation.')
     parser.add_argument('--monitor-path', '-m', type=model_monitor_path, default='./data_fsd50k_tau-srir/model_monitor', help='Path monitoring logs saved.')
     parser.add_argument('--random-seed', '-rs', type=int, default=0, help='Seed number for random and np.random.')
@@ -52,7 +53,7 @@ def get_args():
     parser.add_argument('--train-wav-txt', type=file_path, default=None, help='Train wave file list text.')
     parser.add_argument('--test-wav-txt', type=file_path, default=None, help='Test wave file list text, e.g., for validation or evaluation.')
     parser.add_argument('--test-model', type=file_path, default=None, help='Test model.')
-    parser.add_argument('--test-dataset', default='FSD50K_TAU-SRIR_part', choices=['STARSS23', 'TNSSE21', 'FSD50K_TAU-SRIR_part'], help='Test dataset to switch samples.')
+    parser.add_argument('--test-dataset', default='FSD50K_TAU-SRIR_part', choices=['STARSS23', 'TNSSE21', 'FSD50K_TAU-SRIR_part', 'INFERENCE'], help='Test dataset to switch samples.')
     parser.add_argument('--list-test-wav-txt', type=file_path, default=None, help='List of test wave file list text for FSD50K_TAU-SRIR_part.')
     # net
     parser.add_argument('--net', '-n', default='embaccdoa', choices=['embaccdoa'], help='Neural network architecture.')
